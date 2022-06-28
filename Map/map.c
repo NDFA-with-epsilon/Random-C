@@ -1,5 +1,4 @@
 #include "map.h"
-#include <assert.h>
 
 pair* initialize_map()
 {
