@@ -31,7 +31,7 @@ void mergesort(int* buf, int l, int r)
     if(l >= r) //l > r is for sanity check and l == r is for indivisibility 
     {
         return;
-    }
+    } 
 
 	/* Divide the array into two halves */
     int mid = floor(l + ((r - l) / 2)); 
