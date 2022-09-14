@@ -1,3 +1,6 @@
+#ifndef _MERGE_SORT_
+#define _MERGE_SORT
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -134,3 +137,5 @@ void merge(int* buf , int l, int mid, int r)
 		}
 	}
 }
+
+#endif
