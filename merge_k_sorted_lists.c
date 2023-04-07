@@ -190,7 +190,7 @@ void merge(struct ListNode* list, int l, int mid, int r)
 	}
 }
 
-static inline int listSize(struct ListNode* list) //put the def in the mergeKLists func only
+static inline int listSize(struct ListNode* list) 
 {
     //already checked if "list" is NULL or not in mergeKLists()
 
