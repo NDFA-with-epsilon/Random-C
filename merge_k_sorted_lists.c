@@ -13,13 +13,8 @@ struct ListNode
     struct ListNode *next;
 };
 
-int merge_stub(struct ListNode* list, int listSize)
-{
-    if(!list) return -1;
-
-    mergesort(list, 0, listSize-1);
-    return 0; //success
-}
+void merge(struct ListNode* list, int l, int mid, int r);
+void mergesort(struct ListNode* list, int l, int r);
 
 void mergesort(struct ListNode* list, int l, int r)
 {
@@ -42,26 +37,43 @@ void mergesort(struct ListNode* list, int l, int r)
 
 void merge(struct ListNode* list, int l, int mid, int r)
 {
+    int cnt = 0;
     int l_half = mid - l + 1;
 	int r_half = r - mid;
 
-    struct ListNode** l_buf = malloc(l_half * sizeof(struct ListNode*));
-	struct ListNode** r_buf = malloc(r_half * sizeof(struct ListNode*));
+    // we only care about values stored inside the node i.e. the "container". Not their interlinking
+    int* l_buf = malloc(l_half * sizeof(int));
+	int* r_buf = malloc(r_half * sizeof(int));
 
 
-    struct ListNode* tmp = list + l;
+    struct ListNode* tmp = list;
+    while(cnt < l)
+    {
+        cnt++;
+        tmp = tmp->next;
+    }
+    cnt = 0;
+
     for(int i = 0; i < l_half; i++)
 	{
-		l_buf[i]->val = tmp->val;
+		l_buf[i] = tmp->val;
         tmp = tmp->next;
 	}
 
-    tmp = list + (mid + 1);
+    tmp = list;
+    while(cnt < mid + 1)
+    {
+        cnt++;
+        tmp = tmp->next;
+    }
+    cnt = 0;
+
 	for(int i = 0; i <r_half; i++)
 	{
-		r_buf[i]->val = tmp->val;
+		r_buf[i] = tmp->val;
         tmp = tmp->next;
 	}
+    tmp = list;
 
     int lc = 0; 
     int rc = 0;
@@ -79,9 +91,20 @@ void merge(struct ListNode* list, int l, int mid, int r)
 	{	
 		if(lrbuf == none) //both bufs are non-empty
 		{
-			if(l_buf[lc] < r_buf[rc])
+
+			if(l_buf[lc]< r_buf[rc])
 			{
-				buf[i] = l_buf[lc];
+				// list[i] = l_buf[lc];
+            
+                while(cnt < i)
+                {
+                    tmp = tmp->next;
+                    cnt++;
+                }    
+                cnt = 0;
+
+                tmp->val = l_buf[lc];  
+                tmp = list;
 
 				if(lc + 1 < l_half)	//l_buf is still non-empty
 				{
@@ -96,12 +119,21 @@ void merge(struct ListNode* list, int l, int mid, int r)
 
 			else
 			{
-				buf[i] = r_buf[rc];
+                while(cnt < i)
+                {
+                    tmp = tmp->next;
+                    cnt++;
+                }    
+                cnt = 0;
+                
+				tmp->val = r_buf[rc];
+                tmp = list;
 
 				if(rc + 1 < r_half)	//r_buf is still non-empty
 				{
 					rc += 1; continue;
 				}
+
 				else	//r_buf is empty now
 				{
 					lrbuf = right; continue;
@@ -112,7 +144,16 @@ void merge(struct ListNode* list, int l, int mid, int r)
 
 		else if(lrbuf == left)	//l_buf has been emptied, now read from r_buf sequentially
 		{
-			buf[i] = r_buf[rc];
+			while(cnt < i)
+            {
+                tmp = tmp->next;
+                cnt++;
+            }    
+            cnt = 0;
+            
+            tmp->val = r_buf[rc];
+            tmp = list;
+
 			if(rc + 1 == r_half) //r_buf is also empty now, so terminate loop
 			{
 				break;
@@ -126,7 +167,16 @@ void merge(struct ListNode* list, int l, int mid, int r)
 
 		else	//r_buf is empty, now read from l_buf
 		{
-			buf[i] = l_buf[lc];
+			while(cnt < i)
+            {
+                tmp = tmp->next;
+                cnt++;
+            }    
+            cnt = 0;
+            
+            tmp->val = l_buf[lc];  
+            tmp = list;
+
 			if(lc + 1 == l_half)	//l_buf is also empty now, so terminate loop
 			{
 				break;
@@ -140,9 +190,24 @@ void merge(struct ListNode* list, int l, int mid, int r)
 	}
 }
 
+static inline int listSize(struct ListNode* list) //put the def in the mergeKLists func only
+{
+    //already checked if "list" is NULL or not in mergeKLists()
+
+    int size = 0;
+    struct ListNode* tmp = list;
+
+    while(tmp != NULL)
+    {
+        size++;
+        tmp = tmp->next;
+    }
+
+    return size;
+}
 struct ListNode* mergeKLists(struct ListNode** lists, int listsSize)
 {
-    if(!listsSize || listsSize < 0)
+    if(!lists || !listsSize || listsSize < 0)
     {
         return NULL;
     }
@@ -162,51 +227,15 @@ struct ListNode* mergeKLists(struct ListNode** lists, int listsSize)
         tmp = lists[i];
     }
 
-    //point the iterator to back to head node
-    
-    tmp = lists[0];
+    //calculate size of merged list
+
+    int size = listSize(lists[0]);
 
     //sort the merged list
 
-
-
+    mergesort(lists[0], 0, size-1);
 
     //return the sorted list
     
-    return tmp;
-}
-
-int main(void)
-{
-    struct ListNode* x = malloc(sizeof(struct ListNode));
-    x->val = 1;
-    x->next = malloc(sizeof(struct ListNode));
-    x->next->val = 4;
-    x->next->next = malloc(sizeof(struct ListNode));
-    x->next->next->val = 5;
-    x->next->next->next = NULL;
-
-    struct ListNode* y = malloc(sizeof(struct ListNode));
-    y->val = 1;
-    y->next = malloc(sizeof(struct ListNode));
-    y->next->val = 3;
-    y->next->next = malloc(sizeof(struct ListNode));
-    y->next->next->val = 4;
-    x->next->next->next = NULL;
-
-    struct ListNode* z = malloc(sizeof(struct ListNode));
-    z->val = 2;
-    z->next = malloc(sizeof(struct ListNode));
-    z->next->val = 6;
-    z->next->next = NULL;
-
-    struct ListNode* arr[] = {x, y, z};
-    struct ListNode* merged = mergeKLists(arr, 3);
-    
-    while(merged != NULL)
-    {
-        printf("%d\t", x->val);
-        x = x->next;
-    }
-    return 0;
+    return lists[0];
 }
