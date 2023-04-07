@@ -207,17 +207,29 @@ static inline int listSize(struct ListNode* list) //put the def in the mergeKLis
 }
 struct ListNode* mergeKLists(struct ListNode** lists, int listsSize)
 {
-    if(!lists || !listsSize || listsSize < 0)
+    if(!lists || !listsSize || listsSize < 0) //what if there are holes in the array of lists ??
     {
         return NULL;
     }
 
     // merge all the lists first
     
-    struct ListNode *tmp = lists[0];
+    struct ListNode *tmp = NULL;
+    struct ListNode* merged = NULL;
     
     for(int i = 1; i < listsSize; i++)
     {
+        if(lists[i] == NULL)
+        {
+            continue;
+        }
+        tmp = lists[i]; 
+        
+        if(!merged)
+        {
+            merged = tmp;
+        }
+
         while(tmp->next != NULL)
         {
             tmp = tmp->next;
